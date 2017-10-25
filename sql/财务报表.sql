@@ -111,39 +111,7 @@ where (isnull(jyd.CloseOut,'N')='N' OR CloseOut='')
 and jyd.wsje>0 and ch.ysrq<GETDATE() 
 group by jy.khbh,cus.cus_name,ch.bb,ch.ysrq
 go
-----供应商账龄分析表
-create view gyl_cw_gyszlfxb_V
-as
 
-SELECT jy.khbh as khdm,cus.cus_name,'' as xyqx,'' as xyed,ch.bb,sum(jyd.wsje) as yue,
-(case when 0<datediff(dd,ch.ysrq,getdate()) and datediff(dd,ch.ysrq,getdate())<=30 
-then sum(jyd.wsje) else 0 end) as due30,
-
-(case when 30<datediff(dd,ch.ysrq,getdate()) and datediff(dd,ch.ysrq,getdate())<=60 
-then sum(jyd.wsje) else 0 end) as due60,
-
-(case when 60<datediff(dd,ch.ysrq,getdate()) and datediff(dd,ch.ysrq,getdate())<=180 
-then sum(jyd.wsje) else 0 end) as due180,
-
-(case when 180<datediff(dd,ch.ysrq,getdate()) and datediff(dd,ch.ysrq,getdate())<=365 
-then sum(jyd.wsje) else 0 end) as due365,
-
-(case when 1<datediff(YY,ch.ysrq,getdate()) and datediff(YY,ch.ysrq,getdate())<=2
-then sum(jyd.wsje) else 0 end) as dueY2,
-
-(case when 2<datediff(YY,ch.ysrq,getdate()) and datediff(YY,ch.ysrq,getdate())<=3
-then sum(jyd.wsje) else 0 end) as dueY3,
-
-(case when 3<datediff(YY,ch.ysrq,getdate()) then sum(jyd.wsje) else 0 end) as dueYY
-from gyl_ck_hwjydD jyd
-left join gyl_ck_hwjyd jy on jy.djbh=jyd.djbh
-left join gyl_yw_chtzd ch on jy.chdh=ch.djbh
-left join gyl_yw_chtzdD chd on ch.djbh=chd.djbh and jyd.ddh=chd.ddh and jyd.sx=chd.sx and jyd.dj1=chd.dj --===待修改部分 ===
-left join Ebasic_bcus cus on ch.khdm=cus.cus_no 
-where (isnull(jyd.CloseOut,'N')='N' OR CloseOut='')
-and jyd.wsje>0 and ch.ysrq<GETDATE() 
-group by jy.khbh,cus.cus_name,ch.bb,ch.ysrq
-go
 
 ----月销售日记账
 CREATE VIEW gyl_cw_yxsrjz_V    
@@ -161,14 +129,81 @@ left join Ebasic_bcus cus on ch.khdm=cus.cus_no
 left join (select * from Ebasic_bemp where dept_no in ('s','cs') ) f on f.emp_no=ch.ywy  
 go 
   
+----供应商账龄分析表
+create view gyl_cw_gyszlfxb_V
+as
+SELECT b.gysbh as vdr_no,c.vdr_name,'' as xyqx,'' as xyed,'' as bb,sum(a.wfje) as yue,
+(case when 0<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=30 
+then sum(a.wfje) else 0 end) as due30,
+
+(case when 30<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=60 
+then sum(a.wfje) else 0 end) as due60,
+
+(case when 60<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=180 
+then sum(a.wfje) else 0 end) as due180,
+
+(case when 180<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=365 
+then sum(a.wfje) else 0 end) as due365,
+
+(case when 1<datediff(YY,b.djrq,getdate()) and datediff(YY,b.djrq,getdate())<=2
+then sum(a.wfje) else 0 end) as dueY2,
+
+(case when 2<datediff(YY,b.djrq,getdate()) and datediff(YY,b.djrq,getdate())<=3
+then sum(a.wfje) else 0 end) as dueY3,
+
+(case when 3<datediff(YY,b.djrq,getdate()) then sum(a.wfje) else 0 end) as dueYY
+from gyl_ck_cgshrkdD a
+left join gyl_ck_cgshrkd b on a.djbh=b.djbh
+left join gyl_cw_fkdw_V c on b.gysbh=c.vdr_no
+where (isnull(a.CloseOut,'N')='N' OR CloseOut='')
+and a.wfje>0 and b.djrq<GETDATE() 
+group by b.gysbh,c.vdr_name,b.djrq
+union all
+SELECT '' as vdr_no,'' as vdr_name,'' as xyqx,'' as xyed,'' as bb,sum(a.wfje) as yue,
+(case when 0<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=30 
+then sum(a.wfje) else 0 end) as due30,
+
+(case when 30<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=60 
+then sum(a.wfje) else 0 end) as due60,
+
+(case when 60<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=180 
+then sum(a.wfje) else 0 end) as due180,
+
+(case when 180<datediff(dd,b.djrq,getdate()) and datediff(dd,b.djrq,getdate())<=365 
+then sum(a.wfje) else 0 end) as due365,
+
+(case when 1<datediff(YY,b.djrq,getdate()) and datediff(YY,b.djrq,getdate())<=2
+then sum(a.wfje) else 0 end) as dueY2,
+
+(case when 2<datediff(YY,b.djrq,getdate()) and datediff(YY,b.djrq,getdate())<=3
+then sum(a.wfje) else 0 end) as dueY3,
+
+(case when 3<datediff(YY,b.djrq,getdate()) then sum(a.wfje) else 0 end) as dueYY
+from gyl_ck_wwshrkdD a 
+left join gyl_ck_wwshrkd b on a.djbh=b.djbh
+left join gyl_jczl_cpzlb  cp on a.cpbh=cp.dm
+where (isnull(a.CloseOut,'N')='N' OR CloseOut='')
+and a.wfje>0 and b.djrq<GETDATE() 
+group by b.djrq
+go
   
+---销售明细对账单
+create view gyl_cw_xsmxdzd_V
+as 
+select jy.djrq,'' as shd,jy.djbh,d.ddh,d.htdh,'' as pmgg,'' as color,'' as zs,
+chd.dw,d.zms as sl,d.dj,d.je,'' as kkth,cs.prerev_amt,d.fph,ch.bb,'' as hl,'' as hjje
+from gyl_ck_hwjydD d     ----交运单
+left join gyl_ck_hwjyd jy on jy.djbh=d.djbh
+left join gyl_yw_chtzd ch on jy.chdh=ch.djbh
+left join gyl_yw_chtzdD chd on ch.djbh=chd.djbh and d.ddh=chd.ddh and d.sx=chd.sx and d.dj1=chd.dj --===待修改部分 ===
+left join Ebasic_bcus cus on ch.khdm=cus.cus_no
+left join gyl_cw_cskzyD csk on d.Did=csk.tid 
+left join gyl_cw_cskzy cs on csk.CK_no=cs.CK_no      
+left join (select * from Ebasic_bemp where dept_no in ('s','cs') ) f on f.emp_no=ch.ywy 
+go 
   
-  
-  
-  
-  
-  
-  
+
+
   
   
   

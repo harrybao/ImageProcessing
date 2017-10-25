@@ -24,3 +24,5 @@ select a.id,a.djbh as tid ,a.khbh ,b.cus_name,'其他应收' as CH01,'' as JY_no,a.d
 left join Ebasic_bcus b on a.khbh=b.cus_no
 
 
+
+
